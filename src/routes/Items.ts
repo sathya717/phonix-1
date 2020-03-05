@@ -73,4 +73,52 @@ router.post(
   }
 );
 
+/* 
+  Endpoint - PUT /api/items/:id
+  Access : Private
+  Desc : update Item
+*/
+
+router.put("/:id", checkToken, async (req: any, res: any) => {
+  // check if item exists
+
+  // if not return error
+
+  /* 
+  
+  else update item by parameters passed by user
+  ex :- 
+    if user passed name & price , only update those.
+    ex code :- 
+
+        if(name) user.name = name
+        if(price) user.price = price;
+
+
+  */
+
+  const { name, price, image } = req.body;
+});
+
+/* 
+  Endpoint - DELETE /api/items/:id
+  Access : Private
+  Desc : Delete a item
+*/
+
+router.delete("/:id", checkToken, async (req: any, res: any) => {
+  // check if item exist
+  // if not return error
+  /*
+
+    else:
+      delete the item id in user object (i.e) user.items_for_sale array.
+      delete the document.
+      save the user object. 
+
+
+
+  */
+});
+
 export default router;
