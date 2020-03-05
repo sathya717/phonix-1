@@ -140,6 +140,10 @@ router.delete("/:id", checkToken, async (req: any, res) => {
 
     useritems.forEach(item => item.remove());
 
+    const cart = await Cart.findById(user.cart);
+
+    await cart.remove();
+
     await user.remove();
     return res.json({ status: "Success", user });
   } catch (err) {
