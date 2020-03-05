@@ -9,7 +9,7 @@ const router = Router();
 /* 
   Endpoint - Put /api/cart/:id
   Access : Private
-  Desc : Authenticate a user
+  Desc : Add a item to cart
 */
 
 router.put("/:id", checkToken, async (req: any, res: Response) => {
@@ -51,6 +51,11 @@ router.put("/:id", checkToken, async (req: any, res: Response) => {
   }
 });
 
+/* 
+  Endpoint - Delete /api/cart/:id
+  Access : Private
+  Desc : Remove item from cart
+*/
 router.delete("/:id", checkToken, async (req: any, res: Response) => {
   try {
     const user = await User.findById(req.user);
