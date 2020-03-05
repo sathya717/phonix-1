@@ -7,6 +7,7 @@ export interface userModel extends Document {
   items_bought: Array<Types.ObjectId>;
   items_sold: Array<Types.ObjectId>;
   items_for_sale: Array<Types.ObjectId>;
+  cart: Types.ObjectId;
 }
 
 const userSchema = new Schema({
@@ -42,7 +43,8 @@ const userSchema = new Schema({
   ],
   cart: {
     type: Types.ObjectId,
-    ref: "Cart"
+    ref: "Cart",
+    required: true
   },
   createdAt: {
     type: Date,

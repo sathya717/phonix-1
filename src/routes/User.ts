@@ -6,6 +6,7 @@ import User from "../models/User";
 import { salt, secret } from "../config";
 import Item from "../models/Item";
 import { checkToken } from "../middleware/auth";
+import Cart from "../models/Cart";
 
 const router = Router();
 
@@ -15,7 +16,7 @@ const router = Router();
   Desc : Get a user details
 */
 
-router.get("/", async (req: Request, res: Response) => {
+router.get("/:id", async (req: Request, res: Response) => {
   try {
     const { id } = req.params;
 
@@ -84,12 +85,18 @@ router.post(
       });
       const hashedPassword = await bcrypt.hash(password, salt);
       user.password = hashedPassword;
-      await user.save();
       const payload = {
         user: {
           id: user._id
         }
       };
+
+      const cart = new Cart();
+      cart.owner = user._id;
+      user.cart = cart._id;
+      await user.save();
+      await cart.save();
+
       jwt.sign(payload, secret, { expiresIn: 45000 }, (err, token: string) => {
         if (err) {
           return res
@@ -129,7 +136,10 @@ router.delete("/:id", checkToken, async (req: any, res) => {
         .status(404)
         .json({ errors: [{ msg: "User with id does not exist" }] });
 
-    await Item.deleteMany({ owner: id });
+    const useritems = await Item.find({ owner: id });
+
+    useritems.forEach(item => item.remove());
+
     await user.remove();
     return res.json({ status: "Success", user });
   } catch (err) {

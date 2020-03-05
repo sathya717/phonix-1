@@ -1,6 +1,8 @@
 import { Router, Request, Response } from "express";
 import { check, validationResult } from "express-validator/check";
 import { checkToken } from "../middleware/auth";
+import Item from "../models/Item";
+import User from "../models/User";
 
 const router = Router();
 
@@ -14,21 +16,54 @@ router.post(
   "/",
   [
     checkToken,
-    check("username", "Enter a username")
+    check("name", "Enter item name")
       .not()
       .isEmpty(),
-    check("email", "Please include a valid email").isEmail(),
-    check(
-      "password",
-      "Please enter a password with 6 or more characters"
-    ).isLength({ min: 6 })
+    check("price", "Enter price")
+      .not()
+      .isEmpty(),
+    check("item_type", "Enter item type")
+      .not()
+      .isEmpty(),
+    check("image", "Enter a image")
+      .not()
+      .isEmpty()
   ],
-  async (req: Request, res: Response) => {
+  async (req: any, res: Response) => {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
       return res.status(400).json({ errors: errors.array() });
     }
     try {
+      let user = req.user;
+      if (!user) {
+        return res
+          .status(400)
+          .json({ errors: [{ msg: "User does not exist" }] });
+      }
+      const { name, price, item_type, image } = req.body;
+      console.log(item_type === "mobile");
+      if (item_type !== "mobile" && item_type !== "laptop") {
+        return res.status(400).json({
+          errors: [{ msg: "Invalid item type : either laptop or mobile" }]
+        });
+      }
+
+      const item = new Item({
+        name,
+        price,
+        item_type,
+        image
+      });
+
+      item.owner = user;
+
+      user = await User.findById(user);
+      user.items_for_sale = [...user.items_for_sale, item.id];
+      await user.save();
+      await item.save();
+
+      return res.json({ item });
     } catch (err) {
       console.log(err);
       return res
@@ -37,3 +72,5 @@ router.post(
     }
   }
 );
+
+export default router;
